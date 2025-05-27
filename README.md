@@ -24,9 +24,9 @@ DAAL is  adaptive adjustment loss function based on the paper "Dynamically adapt
 DAAL aims to address challenges related to class imbalance, a key issue in computer vision tasks.  To this end, DAAL strategically balances the influence of majority and minority classes through a dual-pronged approach.  Inspired by the need to ensure fair learning across all classes, DAAL first introduces batch nuclear-norm maximization to promote diverse and discriminative feature learning, followed by the establishment of an adaptive composite loss function to dynamically adjust the loss contributions of different classes, thereby enhancing the prediction accuracy and interpretability of the deep neural network framework.
 
 ## Method
-our loss based on Kalman Filter achieves optimal state estimation through prediction-update cycles, formulated as:
+We achieve the optimal state estimation based on the dynamic estimation of Kalman filtering and the batch kernel norm maximization loss by predicting the proportionally update cycle of the combination of loss functions., formulated as:
  
-### 1. Prediction Step
+#### 1. Prediction Step
 **State Prediction**:  
 $\hat{x}_{k|k-1} = F_k \hat{x}_{k-1|k-1} + B_k u_k$  
 - $\hat{x}_{k|k-1}$: Predicted state estimate at time $k$  
@@ -38,7 +38,7 @@ $P_{k|k-1} = F_k P_{k-1|k-1} F_k^T + Q_k$
 - $P_{k|k-1}$: Prediction uncertainty covariance  
 - $Q_k$: Process noise covariance (model imperfections)
  
-### 2. Update Step
+#### 2. Update Step
 **Kalman Gain Calculation**:  
 $K_k = P_{k|k-1} H_k^T (H_k P_{k|k-1} H_k^T + R_k)^{-1}$  
 - $K_k$: Kalman gain (balances prediction vs measurement)  
@@ -54,9 +54,9 @@ $\hat{x}_{k|k} = \hat{x}_{k|k-1} + K_k (z_k - H_k \hat{x}_{k|k-1})$
 $P_{k|k} = (I - K_k H_k) P_{k|k-1}$  
 - Updates uncertainty for next iteration
  
-## Kalman Adaptive and Batch Nuclear-norm Maximization Loss Function
+### Kalman Adaptive and Batch Nuclear-norm Maximization Loss Function
  
-### 1. Adaptive Dynamic Loss (Time Series Forecasting)
+#### 1. Adaptive Dynamic Loss (Time Series Forecasting)
 **Concept**: Use Kalman Gain $K_k$ to dynamically weight prediction vs ground truth losses  
 **Formula**:  
 $L = \sum_{k=1}^T \left[ K_k \cdot \text{MSE}(y_k, \hat{y}_k) + (1 - K_k) \cdot \text{MSE}(y_{k-1}, \hat{y}_{k|k-1}) \right]$  
@@ -64,14 +64,14 @@ $L = \sum_{k=1}^T \left[ K_k \cdot \text{MSE}(y_k, \hat{y}_k) + (1 - K_k) \cdot 
 - $\hat{y}_{k|k-1}$: Prior estimate from Kalman prediction  
 - High $K_k$ (measurement trust) when low process noise
  
-### 2. Uncertainty-Aware Loss (Object Detection)
+#### 2. Uncertainty-Aware Loss (Object Detection)
 **Concept**: Penalize high-uncertainty predictions less using covariance matrix $P_k$  
 **Formula**:  
 $L_{reg} = \sum_{i=1}^N \frac{1}{\sqrt{\det(P_k^{(i)})}} \cdot \text{SmoothL1}(\Delta x_i, \Delta \hat{x}_i)$  
 - $\det(P_k^{(i)})$: Prediction uncertainty for object $i$  
 - Reduces loss weight for uncertain detections
  
-## Implementation Snippet
+### Implementation Snippet
 ```python
 # Kalman-inspired dynamic loss function
 class KalmanLoss(nn.Module):
@@ -106,13 +106,13 @@ class KalmanLoss(nn.Module):
 
 The loss of the four experimental schemes changes with theincrease of the epochs
 
-<img src="C:\Users\dell\Desktop\image\loss.png" style="zoom: 67%;" />
+<img src="https://github.com/aoxipo/DAAL/blob/main/image/loss.png" style="zoom: 67%;" />
 
 ## Result 
 
 here is our result for object detection, crowd counting task
 
-<img src="C:\Users\dell\Desktop\image\Result.png" alt="Overview" style="zoom:80%;" />
+<img src="https://github.com/aoxipo/DAAL/blob/main/image/Result.png" alt="Overview" style="zoom:80%;" />
 
 
 
